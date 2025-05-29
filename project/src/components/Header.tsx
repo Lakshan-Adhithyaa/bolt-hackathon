@@ -2,12 +2,15 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Moon, Sun, BookOpen } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import UserMenu from './UserMenu';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -59,13 +62,26 @@ const Header = () => {
             </Link>
           </nav>
           
-          <button 
-            onClick={toggleTheme}
-            className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={toggleTheme}
+              className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <Link
+                to="/auth"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
         </div>
         
         <div className="md:hidden flex items-center">
@@ -108,6 +124,15 @@ const Header = () => {
             >
               Create Roadmap
             </Link>
+            {!isAuthenticated && (
+              <Link
+                to="/auth"
+                className="text-sm font-medium py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                onClick={closeMenu}
+              >
+                Sign In
+              </Link>
+            )}
           </nav>
         </div>
       )}
