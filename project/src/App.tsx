@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import Auth from './pages/Auth';
 import RoadmapBuilder from './pages/RoadmapBuilder';
 import RoadmapView from './pages/RoadmapView';
 import { RoadmapProvider } from './context/RoadmapContext';
@@ -34,6 +35,7 @@ function App() {
       <RoadmapProvider>
         <Router>
           <Routes>
+            <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="builder" element={<RoadmapBuilder />} />
