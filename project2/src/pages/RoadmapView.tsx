@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Share2, Download, Trash2, Clock, CheckCircle, CircleDashed, PlayCircle, Filter, Search } from 'lucide-react';
 import { useRoadmap } from '../context/RoadmapContext';
-import { Skill, SkillProgress, VideoResource } from '../types';
+import { Skill, SkillProgress, VideoResource, Roadmap } from '../types';
 import SkillCard from '../components/SkillCard';
 import VideoCard from '../components/VideoCard';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -10,9 +10,10 @@ import ConfirmDialog from '../components/ConfirmDialog';
 const RoadmapView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getRoadmap, updateSkillProgress, deleteRoadmap } = useRoadmap();
+  const { getRoadmap, updateSkillProgress, deleteRoadmap, markRoadmapAsAccessed } = useRoadmap();
+  const accessedIdRef = useRef<string | null>(null);
   
-  const [roadmap, setRoadmap] = useState(id ? getRoadmap(id) : undefined);
+  const [roadmap, setRoadmap] = useState<Roadmap | undefined>(undefined);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -24,11 +25,17 @@ const RoadmapView = () => {
       const fetchedRoadmap = getRoadmap(id);
       setRoadmap(fetchedRoadmap);
       
+      // Only mark as accessed if we haven't already done so for this ID
+      if (accessedIdRef.current !== id) {
+        markRoadmapAsAccessed(id);
+        accessedIdRef.current = id;
+      }
+      
       if (fetchedRoadmap && !selectedSkill) {
         setSelectedSkill(fetchedRoadmap.skills[0] || null);
       }
     }
-  }, [id, getRoadmap]);
+  }, [id, getRoadmap, markRoadmapAsAccessed, selectedSkill]);
   
   if (!roadmap) {
     return (
