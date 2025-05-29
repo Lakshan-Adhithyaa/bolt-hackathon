@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Roadmap, Goal, Skill, SkillProgress, VideoResource } from '../types';
 import { generateSkillRoadmap } from '../utils/roadmapGenerator';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ interface RoadmapContextType {
   saveRoadmap: (roadmap: Roadmap) => void;
   createRoadmap: (goal: Goal) => Roadmap;
   getRoadmap: (id: string) => Roadmap | undefined;
+  markRoadmapAsAccessed: (id: string) => void;
   updateSkillProgress: (roadmapId: string, skillId: string, progress: SkillProgress) => void;
   deleteRoadmap: (id: string) => void;
   updateSkillOrder: (roadmapId: string, skills: Skill[]) => void;
@@ -89,19 +90,18 @@ export const RoadmapProvider: React.FC<{ children: React.ReactNode }> = ({ child
     toast.success('Roadmap saved successfully');
   };
 
-  const getRoadmap = (id: string) => {
-    const roadmap = roadmaps.find(r => r.id === id);
-    if (roadmap) {
-      // Update last accessed timestamp
-      const now = new Date().toISOString();
-      setRoadmaps(prev => 
-        prev.map(r => 
-          r.id === id ? { ...r, lastAccessedAt: now } : r
-        )
-      );
-    }
-    return roadmap;
-  };
+  const getRoadmap = useCallback((id: string) => {
+    return roadmaps.find(r => r.id === id);
+  }, [roadmaps]);
+
+  const markRoadmapAsAccessed = useCallback((id: string) => {
+    const now = new Date().toISOString();
+    setRoadmaps(prev => 
+      prev.map(r => 
+        r.id === id ? { ...r, lastAccessedAt: now } : r
+      )
+    );
+  }, []);
 
   const updateSkillProgress = (roadmapId: string, skillId: string, progress: SkillProgress) => {
     const now = new Date().toISOString();
@@ -266,6 +266,7 @@ export const RoadmapProvider: React.FC<{ children: React.ReactNode }> = ({ child
         saveRoadmap,
         createRoadmap,
         getRoadmap,
+        markRoadmapAsAccessed,
         updateSkillProgress,
         deleteRoadmap,
         updateSkillOrder,
