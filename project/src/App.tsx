@@ -7,6 +7,7 @@ import RoadmapBuilder from './pages/RoadmapBuilder';
 import RoadmapView from './pages/RoadmapView';
 import { RoadmapProvider } from './context/RoadmapContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
 function App() {
@@ -32,18 +33,20 @@ function App() {
 
   return (
     <ThemeProvider>
-      <RoadmapProvider>
-        <Router>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="builder" element={<RoadmapBuilder />} />
-              <Route path="roadmap/:id" element={<RoadmapView />} />
-            </Route>
-          </Routes>
-        </Router>
-      </RoadmapProvider>
+      <AuthProvider>
+        <RoadmapProvider>
+          <Router>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="builder" element={<RoadmapBuilder />} />
+                <Route path="roadmap/:id" element={<RoadmapView />} />
+              </Route>
+            </Routes>
+          </Router>
+        </RoadmapProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
